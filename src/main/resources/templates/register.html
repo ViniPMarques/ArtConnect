@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar conta</title>
-    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/log.css}" rel="stylesheet" type="text/css"/>
+    <style>
+        a:link {
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="auth-page">
             <div class="card-auth">
-                <h1>ArtConnect</h1>
+                <a class="link" th:href="@{/home}"><h1>ArtConnect</h1></a>
                 <form class="form" th:action="@{/register}" th:object="${usuarioForm}" method="post">
                     <h3>Cria sua conta. É de graça!</h3>
 

@@ -1,12 +1,6 @@
 package com.ufsm.csi.artconnect.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +15,9 @@ public class Obra {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idobra;
-
-    @ManyToOne
-    @JoinColumn(name = "idartista")
-    private Usuario artista;
+    @Column(name = "filename")
+    private String fileName;
+    @Column(name = "filepath")
+    private String filePath;
+    private Long idartista;
 }

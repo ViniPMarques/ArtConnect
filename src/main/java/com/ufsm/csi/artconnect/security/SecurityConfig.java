@@ -30,7 +30,7 @@ public class SecurityConfig {
             .build();
     }
 
-    //define a criptografia usada e a classe que extende de UserDetailsService que vai gerenciar o login
+    //define a criptografia usada e a classe que extende de UserDetailsService que gerencia o login
     @Bean
     public DaoAuthenticationProvider getDaoAuthProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
@@ -54,7 +54,8 @@ public class SecurityConfig {
                     request.requestMatchers("/login/**").permitAll()
                             .requestMatchers("/register/**").permitAll()
                             .requestMatchers("/resources/**","/css/**").permitAll()
-                            .anyRequest().authenticated();
+                            .anyRequest().permitAll();
+                            //.authenticated();
                 })
                 //.and()
                 .formLogin(login -> login

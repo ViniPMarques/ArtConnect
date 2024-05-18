@@ -1,9 +1,6 @@
 package com.ufsm.csi.artconnect.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,8 @@ public class Usuario {
     private Long idusuario;
     private String nomeusuario;
     private String emailusuario;
+    private String profilepicture;
+    private String description;
     private String senhausuario;
     private int tipousuario;
 }
