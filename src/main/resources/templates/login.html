@@ -16,6 +16,7 @@
         <div class="auth-page">
             <div class="card-auth">
                 <a class="link" th:href="@{/home}"><h1>ArtConnect</h1></a>
+                <h2 class="success" th:text="${success}"></h2>
                 <h3>Faça seu login!</h3>
                 <p th:if="${loginError}" class="error">Email ou senha incorretos</p>
                 <form th:action="@{/login}" method="post" class="form">

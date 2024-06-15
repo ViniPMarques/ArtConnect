@@ -18,6 +18,8 @@ public class UsuarioForm {
     @Size(min = 4, message = "senha deve ter no mínimo 4 caracteres")
     private String senha;
 
+    private String description;
+
     private Boolean artista;
 
     public UsuarioForm(){

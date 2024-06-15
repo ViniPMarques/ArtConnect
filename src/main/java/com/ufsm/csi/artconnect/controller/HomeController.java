@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class HomeController {
     private UsuarioService usuarioService;
 
     @GetMapping({"/", "/home"})
-    public String showHomePage(Model model) {
-        List<UsuarioDto> artistas = usuarioService.findAllArtistas();
+    public String showHomePage(Model model, @RequestParam(name = "filtro", required = false) String filtro) {
+        List<UsuarioDto> artistas = usuarioService.findAllArtistas(filtro);
         model.addAttribute("artists", artistas);
         return "home";
     }

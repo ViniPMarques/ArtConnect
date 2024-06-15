@@ -109,3 +109,9 @@ body{
         width: 300px;
     }
 }
+
+.success{
+    font-size: 17px;
+    color: #0d990d;
+    margin-bottom: 20px;
+}

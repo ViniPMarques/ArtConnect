@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,11 @@ public class LoginSuccess implements AuthenticationSuccessHandler{
         if(session != null)
             session.setAttribute("usuario", usuario.get());
 
-        response.sendRedirect(request.getContextPath()+"/usuario");
+        if(authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))){
+            response.sendRedirect(request.getContextPath()+"/artistPage");
+        }
+        else{
+            response.sendRedirect(request.getContextPath()+"/usuario");
+        }
     }
 }

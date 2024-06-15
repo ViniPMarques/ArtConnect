@@ -28,33 +28,37 @@
             background-color: #f9f9f9;
             border-radius: 5px;
         }
-        .gallery img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin: 10px;
+        .gallery{
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .gallery > div{
+            position: relative;
+        }
+        .gallery > div button{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+        .gallery img{
+            width: 100%;
+        }
+        @media(min-width: 768px){
+            .gallery{
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/artconnect/home">ArtConnect</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-item nav-link disabled" href="#">Sobre Nós</a>
-            <a class="nav-item nav-link" href="/artconnect/register">Criar Conta</a>
-            <a class="nav-item btn btn-outline-primary" type="button" href="/artconnect/login">Log in</a>
-        </div>
-    </div>
-</nav>
+<header th:insert="components/navbar"> </header>
+
 
 <div class="container mt-5">
     <div class="profile-header">
-        <div class="profile-image">
-            <img src="${artist.profilePicture ?: '/images/default-profile.png'}" alt="Profile Picture">
+        <div class="profile-images">
+            <img th:src="${artist.profilepicture} ? @{'/img/user.png'} : @{'/img/user.png'}" alt="Profile Picture">
         </div>
         <h2 th:text="${artist.nomeusuario}">Nome do Artista</h2>
     </div>
@@ -71,12 +75,15 @@
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="sobre" role="tabpanel" aria-labelledby="sobre-tab">
-            <p th:text="${artist.description}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac dui eu metus commodo euismod. In hac habitasse platea dictumst.</p>
+            <p th:text="${artist.description} ?: 'Descrição do artista não encontrada'"></p>
         </div>
         <div class="tab-pane fade" id="galeria" role="tabpanel" aria-labelledby="galeria-tab">
             <div class="gallery">
                 <div th:each="obra : ${obras}">
-                    <img th:src="@{'/obras/' + ${obra.filename}}" alt="Artwork" />
+                    <img th:src="@{'/obras/' + ${obra.fileName}}" alt="Artwork" />
+                    <form th:action="@{/artist/obra/{id}(id = ${obra.idobra})}" method="post" th:id="'form_'+${obra.idobra}">
+                        <button type="button" class="btn btn-danger" th:onclick="deleteObra([[${obra.idobra}]])">Apagar</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -84,21 +91,18 @@
             <!-- Placeholder for commissions content -->
         </div>
     </div>
-
-    <div class="mt-4">
-        <h4>Upload New Artwork</h4>
-        <form th:action="@{/artist/{id}/upload(id=${artist.idusuario})}" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="file">Choose file</label>
-                <input type="file" class="form-control-file" id="file" name="file">
-            </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
-    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1Qtv3Rn7W3mgPxhU9hb/G6mGepKNWtLbllNs56p+mFXg4lY9g6XK2" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+    function deleteObra(id){
+        const resp = confirm("Deseja apagar esta obra?");
+        if(resp){
+            document.getElementById("form_" + id).submit();
+        }
+    }
+</script>
 </body>
 </html>

@@ -1,11 +1,23 @@
 package com.ufsm.csi.artconnect.service.impl;
 
 import com.ufsm.csi.artconnect.dto.UsuarioDto;
+import com.ufsm.csi.artconnect.form.PerfilForm;
 import com.ufsm.csi.artconnect.form.UsuarioForm;
 import com.ufsm.csi.artconnect.model.Usuario;
 import com.ufsm.csi.artconnect.repository.ArtistRepository;
 import com.ufsm.csi.artconnect.repository.UsuarioRepository;
 import com.ufsm.csi.artconnect.service.UsuarioService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.hibernate.Session;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,11 +33,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final ArtistRepository artistRepository;
 
+    private EntityManager entityManager;
+
     @Autowired
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, ArtistRepository artistRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, ArtistRepository artistRepository, PasswordEncoder passwordEncoder, EntityManager entityManager) {
         this.usuarioRepository = usuarioRepository;
         this.artistRepository = artistRepository;
         this.passwordEncoder = passwordEncoder;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -35,8 +50,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<UsuarioDto> findAllArtistas() {
-        List<Usuario> artistas = artistRepository.findByTipousuario(1); // Assuming 1 represents an artist
+    public List<UsuarioDto> findAllArtistas(String filtro) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Usuario> query = cb.createQuery(Usuario.class);
+        Root<Usuario> root = query.from(Usuario.class);
+        query.select(root);
+        query.where(cb.equal(root.get("tipousuario"), 1));
+        
+        if(filtro != null){
+            query.where(cb.like(root.get("nomeusuario"), "%" + filtro.toLowerCase() + "%"));
+        }
+        
+        TypedQuery<Usuario> result = this.entityManager.createQuery(query);
+        List<Usuario> artistas = result.getResultList();
         return artistas.stream().map(this::mapToUsuarioDto).collect(Collectors.toList());
     }
 
@@ -66,6 +92,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setSenhausuario(passwordEncoder.encode(usuarioForm.getSenha()));
         this.usuarioRepository.save(u);
         return mapToUsuarioDto(u);
+    }
+
+    @Override
+    public UsuarioDto update(PerfilForm usuarioForm, HttpServletRequest request) {
+        Usuario currentUser = (Usuario) request.getSession().getAttribute("usuario");
+        Usuario usuario = this.usuarioRepository.findByEmailusuario(currentUser.getEmailusuario()).get();
+        usuario.setDescription(usuarioForm.getDescription());
+        usuario.setNomeusuario(usuarioForm.getNome());
+        usuario = this.usuarioRepository.save(usuario);
+        request.getSession().setAttribute("usuario", usuario);
+        return mapToUsuarioDto(usuario);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.ufsm.csi.artconnect.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
             true,
             true, 
             true, 
-            new ArrayList<>()
+            user.get().getTipousuario() == 0 ? Arrays.asList(new SimpleGrantedAuthority("USER")) : Arrays.asList(new SimpleGrantedAuthority("ADMIN"))
         );
 	}
 }

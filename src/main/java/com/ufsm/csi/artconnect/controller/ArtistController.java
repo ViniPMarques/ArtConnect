@@ -2,17 +2,25 @@ package com.ufsm.csi.artconnect.controller;
 
 import com.ufsm.csi.artconnect.dto.UsuarioDto;
 import com.ufsm.csi.artconnect.model.Obra;
+import com.ufsm.csi.artconnect.model.Usuario;
 import com.ufsm.csi.artconnect.service.ObraService;
 import com.ufsm.csi.artconnect.service.UsuarioService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.security.Principal;
 import java.util.List;
@@ -25,56 +33,63 @@ public class ArtistController {
     @Autowired
     private ObraService obraService;
 
-    @GetMapping("/artistPage/{id}")
-    public String showArtistPage(@PathVariable Long id, Model model) {
-        UsuarioDto artist = usuarioService.findUsuarioById(id);
-        List<Obra> obras = obraService.findObrasByArtistId(id);
+    @GetMapping("/artistPage")
+    public String showArtistPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDto artist = usuarioService.findUsuarioById(usuario.getIdusuario());
+        List<Obra> obras = obraService.findObrasByArtistId(usuario.getIdusuario());
         model.addAttribute("artist", artist);
         model.addAttribute("obras", obras);
         return "artistPage";
     }
 
-    @GetMapping("/artist/{id}")
-    public String getArtist(@PathVariable Long id, Model model) {
+    @GetMapping("/artistPage/{id}")
+    public String showArtistPage(@PathVariable Long id ,Model model, HttpServletRequest request) {
         UsuarioDto artist = usuarioService.findUsuarioById(id);
-        if (artist != null) {
-            System.out.println("Artist found: " + artist.getDescription()); //Debug
-            model.addAttribute("artist", artist);
-        } else {
-            System.out.println("Artist not found for id: " + id); //Debug
-            return "errorPage";
-        }
+        List<Obra> obras = obraService.findObrasByArtistId(artist.getIdusuario());
+        model.addAttribute("artist", artist);
+        model.addAttribute("obras", obras);
         return "artistPage";
     }
 
-    @GetMapping("/artist/{id}/upload")
-    public String showUploadForm(@PathVariable Long id, Model model, Principal principal) {
-        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
-        if (currentUser != null && currentUser.getIdusuario().equals(id)) {
-            model.addAttribute("artistId", id);
+    @GetMapping("/artist/upload")
+    public String showUploadForm(Model model, Authentication authentication) {
+        if(authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))){
             return "uploadForm";
-        } else {
+        }
+        else{
             return "errorPage";
         }
     }
 
-    @PostMapping("/artist/{id}/upload")
-    public String handleFileUpload(@PathVariable Long id, @RequestParam("file") MultipartFile file, Model model, Principal principal) {
+    @PostMapping("/artist/upload")
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model, Principal principal) {
         UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
-        if (currentUser != null && currentUser.getIdusuario().equals(id)) {
-            try {
-                obraService.saveObra(file, id);
-                model.addAttribute("message", "File uploaded successfully!");
-            } catch (IOException e) {
-                model.addAttribute("message", "Failed to upload file!");
-            }
-            return "uploadForm";
-        } else {
-            return "errorPage";
+        try {
+            obraService.saveObra(file, currentUser);
+            model.addAttribute("message", "File uploaded successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("message", "Failed to upload file!");
         }
+        return "uploadForm";
     }
 
-    @GetMapping("/artist/{id}/gallery")
+    @PostMapping("/artist/obra/{id}")
+    public String deleteFile(@PathVariable Long id, Model model, Principal principal) {
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        try {
+            obraService.deleteObra(id, currentUser);
+            model.addAttribute("message", "File deleted successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("message", "Failed to delete file!");
+        }
+        return "redirect:/artistPage";
+    }
+
+    @GetMapping("/artist/gallery")
     public String showGallery(@PathVariable Long id, Model model) {
         List<Obra> obras = obraService.findObrasByArtistId(id);
         model.addAttribute("obras", obras);
@@ -96,5 +111,18 @@ public class ArtistController {
             throw new RuntimeException("Could not read file: " + filename, e);
         }
     }
+//
+//    @PostMapping("/deactivateAccount")
+//    @ResponseBody
+//    public String deactivateAccount(Authentication authentication) {
+//        String username = authentication.getName();
+//        Usuario usuario = usuarioService.findByNomeusuario(username);
+//        if (usuario != null) {
+//            usuario.setAtivo(false);
+//            usuarioService.updateUsuario(usuario);
+//            return "success";
+//        }
+//        return "error";
+//    }
 
 }

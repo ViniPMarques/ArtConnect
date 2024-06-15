@@ -54,8 +54,7 @@ public class SecurityConfig {
                     request.requestMatchers("/login/**").permitAll()
                             .requestMatchers("/register/**").permitAll()
                             .requestMatchers("/resources/**","/css/**").permitAll()
-                            .anyRequest().permitAll();
-                            //.authenticated();
+                            .anyRequest().authenticated();
                 })
                 //.and()
                 .formLogin(login -> login
