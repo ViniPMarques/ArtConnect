@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta</title>
+    <link th:href="@{/css/log.css}" rel="stylesheet" type="text/css"/>
+    <style>
+        a:link {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-page">
+            <div class="card-auth">
+                <a class="link" th:href="@{/home}"><h1>ArtConnect</h1></a>
+                <form class="form" th:action="@{/register}" th:object="${usuarioForm}" method="post">
+                    <h3>Cria sua conta. É de graça!</h3>
+
+                    <div class="form-group">
+                        <input type="text" th:field="*{nome}" placeholder="Nome do perfil"/>
+                        <span class="error" th:if="${#fields.hasErrors('nome')}">Nome inválido</span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" th:field="*{email}" placeholder="Insira seu email" />
+                        <span class="error" th:if="${#fields.hasErrors('email')}">Email inválido</span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" th:field="*{senha}" placeholder="Insira sua senha"/>
+                        <span class="error" th:if="${#fields.hasErrors('senha')}">Senha inválida</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Marque a opção caso queira criar uma conta de artista
+                            <input type="checkbox" th:checked="*{artista}" th:field="*{artista}"/>
+                        </label>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn btn-submit" type="submit">
+                            Criar Conta
+                        </button>
+                    </div>
+                </form>
+                <a class="link" th:href="@{/login}">Já tem uma conta? Faça Login aqui</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

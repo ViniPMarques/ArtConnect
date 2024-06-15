@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtConnect - Artist Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .profile-header {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: inline-block;
+            background-size: cover;
+            background-position: center;
+        }
+        .tabs {
+            margin-top: 20px;
+        }
+        .tab-content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .gallery{
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .gallery > div{
+            position: relative;
+        }
+        .gallery > div button{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+        .gallery img{
+            width: 100%;
+        }
+        @media(min-width: 768px){
+            .gallery{
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<header th:insert="components/navbar"> </header>
+
+
+<div class="container mt-5">
+    <div class="profile-header">
+        <div class="profile-images">
+            <img th:src="${artist.profilepicture} ? @{'/img/user.png'} : @{'/img/user.png'}" alt="Profile Picture">
+        </div>
+        <h2 th:text="${artist.nomeusuario}">Nome do Artista</h2>
+    </div>
+    <ul class="nav nav-tabs tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="sobre-tab" data-toggle="tab" href="#sobre" role="tab" aria-controls="sobre" aria-selected="true">Sobre</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="galeria-tab" data-toggle="tab" href="#galeria" role="tab" aria-controls="galeria" aria-selected="false">Galeria</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="comissoes-tab" data-toggle="tab" href="#comissoes" role="tab" aria-controls="comissoes" aria-selected="false">Comissões</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="sobre" role="tabpanel" aria-labelledby="sobre-tab">
+            <p th:text="${artist.description} ?: 'Descrição do artista não encontrada'"></p>
+        </div>
+        <div class="tab-pane fade" id="galeria" role="tabpanel" aria-labelledby="galeria-tab">
+            <div class="gallery">
+                <div th:each="obra : ${obras}">
+                    <img th:src="@{'/obras/' + ${obra.fileName}}" alt="Artwork" />
+                    <form th:action="@{/artist/obra/{id}(id = ${obra.idobra})}" method="post" th:id="'form_'+${obra.idobra}">
+                        <button type="button" class="btn btn-danger" th:onclick="deleteObra([[${obra.idobra}]])">Apagar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="comissoes" role="tabpanel" aria-labelledby="comissoes-tab">
+            <!-- Placeholder for commissions content -->
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1Qtv3Rn7W3mgPxhU9hb/G6mGepKNWtLbllNs56p+mFXg4lY9g6XK2" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+    function deleteObra(id){
+        const resp = confirm("Deseja apagar esta obra?");
+        if(resp){
+            document.getElementById("form_" + id).submit();
+        }
+    }
+</script>
+</body>
+</html>
