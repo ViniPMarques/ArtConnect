@@ -27,6 +27,10 @@ public class UserDetailsServiceImpl implements UserDetailsService{
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("user not available");
         }
+        Usuario usuario = user.get();
+        if (!usuario.isAtivo()) {
+            throw new RuntimeException("Conta desativada");
+        }
         return new org.springframework.security.core.userdetails.User(
             user.get().getEmailusuario(), 
             user.get().getSenhausuario(), 

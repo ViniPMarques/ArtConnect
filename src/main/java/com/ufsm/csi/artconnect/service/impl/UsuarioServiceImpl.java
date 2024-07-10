@@ -15,9 +15,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.hibernate.Session;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -122,4 +119,13 @@ public class UsuarioServiceImpl implements UsuarioService {
             return null;
         }
     }
+
+    @Override
+    public UsuarioDto deactivateAccount(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        usuario.setAtivo(false); // Desativa a conta
+        usuarioRepository.save(usuario);
+        return null;
+    }
+
 }

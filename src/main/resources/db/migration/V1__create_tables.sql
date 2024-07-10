@@ -6,6 +6,7 @@ CREATE TABLE Usuario(
                         description VARCHAR(200),
                         senhaUsuario VARCHAR(255) NOT NULL,
                         tipoUsuario INT,
+                        ativo BOOL DEFAULT 'true',
                         UNIQUE(emailUsuario)
 );
 

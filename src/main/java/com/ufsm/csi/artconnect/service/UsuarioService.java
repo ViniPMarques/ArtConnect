@@ -18,6 +18,7 @@ public interface UsuarioService {
     UsuarioDto update(PerfilForm usuario, HttpServletRequest request);
     UsuarioDto findUsuarioById(Long id);
     UsuarioDto findUsuarioByEmail(String name);
+    UsuarioDto deactivateAccount(Long id);
 
 //    @Override
 //    public UsuarioDto findUsuarioById(Long id) {
