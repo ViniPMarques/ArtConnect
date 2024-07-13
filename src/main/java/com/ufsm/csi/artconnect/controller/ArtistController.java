@@ -1,13 +1,20 @@
 package com.ufsm.csi.artconnect.controller;
 
 import com.ufsm.csi.artconnect.dto.UsuarioDto;
+import com.ufsm.csi.artconnect.form.ComissaoForm;
+import com.ufsm.csi.artconnect.form.PedidoForm;
+import com.ufsm.csi.artconnect.model.Comissao;
 import com.ufsm.csi.artconnect.model.Obra;
+import com.ufsm.csi.artconnect.model.Pedido;
 import com.ufsm.csi.artconnect.model.Usuario;
+import com.ufsm.csi.artconnect.service.ComissaoService;
 import com.ufsm.csi.artconnect.service.ObraService;
+import com.ufsm.csi.artconnect.service.PedidoService;
 import com.ufsm.csi.artconnect.service.UsuarioService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -18,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
@@ -32,15 +40,26 @@ public class ArtistController {
     private UsuarioService usuarioService;
     @Autowired
     private ObraService obraService;
+    @Autowired
+    private ComissaoService comissaoService;
+    @Autowired
+    private PedidoService pedidoService;
 
     @GetMapping("/artistPage")
-    public String showArtistPage(Model model, HttpServletRequest request) {
+    public String showArtistPage(Model model, HttpServletRequest request) throws Exception{
         HttpSession session = request.getSession();
         Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if(usuario.getTipousuario() == 0){
+            throw new Exception("acesso somente para artistas");
+        }
         UsuarioDto artist = usuarioService.findUsuarioById(usuario.getIdusuario());
         List<Obra> obras = obraService.findObrasByArtistId(usuario.getIdusuario());
+        List<Comissao> comissoes = comissaoService.getAllByArtista(usuario.getIdusuario());
         model.addAttribute("artist", artist);
         model.addAttribute("obras", obras);
+        model.addAttribute("comissoes", comissoes);
+        model.addAttribute("podeEditar", true);
+        model.addAttribute("pedidoForm", new PedidoForm());
         return "artistPage";
     }
 
@@ -48,10 +67,47 @@ public class ArtistController {
     public String showArtistPage(@PathVariable Long id ,Model model, HttpServletRequest request) {
         UsuarioDto artist = usuarioService.findUsuarioById(id);
         List<Obra> obras = obraService.findObrasByArtistId(artist.getIdusuario());
+        List<Comissao> comissoes = comissaoService.getAllByArtista(artist.getIdusuario());
         model.addAttribute("artist", artist);
         model.addAttribute("obras", obras);
+        model.addAttribute("comissoes", comissoes);
+        model.addAttribute("podeEditar", false);
+        model.addAttribute("pedidoForm", new PedidoForm());
         return "artistPage";
     }
+
+    @GetMapping("/artist/comissao")
+    public String showComisssoes(Model model, HttpServletRequest request) {
+        model.addAttribute("comissaoForm", new ComissaoForm());
+        return "comissao/cadastro";
+    }
+
+    @GetMapping("/artist/comissao/update/{id}")
+    public String updateComissoesView(@PathVariable Long id, Model model, Principal principal) throws Exception{
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        Comissao comissao = comissaoService.findByArtista(currentUser.getIdusuario(), id);
+        ComissaoForm comissaoForm = new ComissaoForm(comissao);
+        model.addAttribute("comissaoForm", comissaoForm);
+        return "comissao/cadastro";
+    }
+
+    @PostMapping("/artist/comissao")
+    public String saveComissao(@Valid ComissaoForm comissaoForm, RedirectAttributes redirectAttributes, Principal principal) throws Exception{
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        comissaoService.save(comissaoForm, currentUser);
+        redirectAttributes.addFlashAttribute("success", "salvo com sucesso");
+        return "redirect:/artistPage";
+    }
+
+    @PostMapping("/artist/comissao/delete")
+    public String deleteComissao(@RequestParam Long id, RedirectAttributes redirectAttributes, Principal principal) throws Exception{
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        comissaoService.delete(id, currentUser);
+        redirectAttributes.addFlashAttribute("success", "deletado com sucesso");
+        return "redirect:/artistPage";
+    }
+
+
 
     @GetMapping("/artist/upload")
     public String showUploadForm(Model model, Authentication authentication) {
@@ -61,6 +117,14 @@ public class ArtistController {
         else{
             return "errorPage";
         }
+    }
+
+    @GetMapping("/artist/historico")
+    public String historico(Model model, Principal principal) {
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        List<Pedido> pedidos = pedidoService.findByArtista(currentUser.getIdusuario());
+        model.addAttribute("pedidos", pedidos);
+        return "artistHistory";
     }
 
     @PostMapping("/artist/upload")

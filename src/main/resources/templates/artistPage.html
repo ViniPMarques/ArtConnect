@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArtConnect - Artist Page</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link th:href="@{/css/log.css}" rel="stylesheet" type="text/css"/>
     <style>
         .profile-header {
             text-align: center;
@@ -44,6 +45,14 @@
         .gallery img{
             width: 100%;
         }
+        .comissao{
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: lightgrey;
+            padding: 15px;
+            margin: 10px;
+        }
         @media(min-width: 768px){
             .gallery{
                 grid-template-columns: repeat(3, 1fr);
@@ -56,6 +65,7 @@
 
 
 <div class="container mt-5">
+    <h2 class="success" th:text="${success}"></h2>
     <div class="profile-header">
         <div class="profile-images">
             <img th:src="${artist.profilepicture} ? @{'/img/user.png'} : @{'/img/user.png'}" alt="Profile Picture">
@@ -81,14 +91,54 @@
             <div class="gallery">
                 <div th:each="obra : ${obras}">
                     <img th:src="@{'/obras/' + ${obra.fileName}}" alt="Artwork" />
-                    <form th:action="@{/artist/obra/{id}(id = ${obra.idobra})}" method="post" th:id="'form_'+${obra.idobra}">
+                    <form th:if="${podeEditar && obra.idartista == #ctx.session.usuario.idusuario}" th:action="@{/artist/obra/{id}(id = ${obra.idobra})}" method="post" th:id="'form_'+${obra.idobra}">
                         <button type="button" class="btn btn-danger" th:onclick="deleteObra([[${obra.idobra}]])">Apagar</button>
                     </form>
                 </div>
             </div>
         </div>
         <div class="tab-pane fade" id="comissoes" role="tabpanel" aria-labelledby="comissoes-tab">
-            <!-- Placeholder for commissions content -->
+            <a th:if="${podeEditar}" class="btn btn-primary" th:href="@{/artist/comissao}">Cadastrar comissão</a>
+            <div class="comissao" th:each="comissao : ${comissoes}">
+                <p th:text="${comissao.descricao}"></p>
+                <p th:text="${comissao.valor}"></p>
+                <div th:if="${podeEditar && comissao.artista.idusuario == #ctx.session.usuario.idusuario}">
+                    <a class="btn btn-warning" th:href="@{/artist/comissao/update/{id} (id = ${comissao.idcomissao})}">Editar</a>
+                    <form  th:action="@{/artist/comissao/delete}" method="post" th:id="'form_'+${comissao.idcomissao}">
+                        <input type="hidden" name="id" th:value="${comissao.idcomissao}">
+                        <button type="submit" class="btn btn-danger">Apagar</button>
+                    </form>
+                </div>
+                <button type="button" class="btn btn-primary" th:if="${!podeEditar}" th:onclick="fazerPedido([[${comissao.idcomissao}]])">Fazer pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-pedido" th:if="${!podeEditar}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form class="form" th:action="@{/usuario/pedido}" th:object="${pedidoForm}" method="post">
+                        <h3>Faça o seu pedido!</h3>
+
+                        <div class="form-group">
+                            <input type="text" th:field="*{descricao}" placeholder="Descrição"/>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="hidden" id="idcomissaopedido" th:field="*{idcomissao}" />
+                        </div>
+                        <div class="buttons">
+                            <button class="btn btn-submit" type="submit">
+                                Fazer pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Fechar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -97,11 +147,21 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1Qtv3Rn7W3mgPxhU9hb/G6mGepKNWtLbllNs56p+mFXg4lY9g6XK2" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
+    const myModal = new bootstrap.Modal(document.getElementById('modal-pedido'))
     function deleteObra(id){
         const resp = confirm("Deseja apagar esta obra?");
         if(resp){
             document.getElementById("form_" + id).submit();
         }
+    }
+
+    function fazerPedido(id){
+        document.getElementById("idcomissaopedido").value = id;
+        myModal.show();
+    }
+
+    function closeModal(){
+        myModal.hide();
     }
 </script>
 </body>

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a sec:authorize="hasAuthority('ADMIN')" class="navbar-brand" href="/artconnect/home">ArtConnect</a>
-    <a sec:authorize="hasAuthority('USER')" class="navbar-brand" href="/artconnect/usuario">ArtConnect</a>
+    <a sec:authorize="hasAuthority('USER')" class="navbar-brand" href="/artconnect/home">ArtConnect</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,7 +10,7 @@
             <a sec:authorize="hasAuthority('ADMIN')" class="nav-item nav-link" href="/artconnect/artistPage">Sua Página</a>
             <a class="nav-item nav-link disabled" href="#">Sobre Nós</a>
             <a sec:authorize="hasAuthority('ADMIN')" class="nav-item nav-link" href="/artconnect/artist/upload">Upload de obra</a>
-            <a sec:authorize="hasAuthority('ADMIN')" class="nav-item nav-link disabled" href="#">Histórico de comissões</a>
+            <a sec:authorize="hasAuthority('ADMIN')" class="nav-item nav-link" href="/artconnect/artist/historico">Histórico de comissões</a>
 
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
                 <a class="nav-item nav-link" href="/artconnect/usuario/perfil">Editar Perfil</a>
