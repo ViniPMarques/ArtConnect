@@ -13,21 +13,21 @@ import com.ufsm.csi.artconnect.service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.security.Principal;
+import java.util.Map;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Controller
@@ -36,6 +36,8 @@ public class UsuarioController {
     private UsuarioService usuarioService;
     private PedidoService pedidoService;
     private UsuarioRepository usuarioRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+
 
     public UsuarioController(UsuarioService usuarioService, PedidoService pedidoService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
@@ -90,5 +92,20 @@ public class UsuarioController {
         this.pedidoService.save(pedido, currentUser);
         redirectAttributes.addFlashAttribute("success", "pedido efetuado com sucesso");
         return "redirect:/home";
+    }
+
+    @PostMapping("/desativar")
+    @ResponseBody
+    public ResponseEntity<String> desativarConta(@RequestBody Map<String, Long> payload) {
+        Long id = payload.get("id");
+        logger.info("Desativando conta com ID: " + id);
+        try {
+            usuarioService.deactivateAccount(id);
+            logger.info("Conta desativada com sucesso para o ID: " + id);
+            return ResponseEntity.ok("Conta desativada com sucesso");
+        } catch (Exception e) {
+            logger.error("Erro ao desativar a conta com ID: " + id, e);
+            return ResponseEntity.status(500).body("Erro ao desativar a conta");
+        }
     }
 }

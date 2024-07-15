@@ -87,6 +87,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setNomeusuario(usuarioForm.getNome());
         u.setTipousuario(usuarioForm.getArtista() ? 1 : 0);
         u.setSenhausuario(passwordEncoder.encode(usuarioForm.getSenha()));
+        u.setAtivo(true);
         this.usuarioRepository.save(u);
         return mapToUsuarioDto(u);
     }
@@ -125,7 +126,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         usuario.setAtivo(false); // Desativa a conta
         usuarioRepository.save(usuario);
-        return null;
+        return mapToUsuarioDto(usuario);
     }
+
 
 }

@@ -46,20 +46,21 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    function deactivateAccount(){
+    function deactivateAccount() {
         const confirmation = confirm("Você tem certeza que deseja desativar sua conta?");
-        if(confirmation){
+        if (confirmation) {
+            const userId = $('input[name="idusuario"]').val();
             $.ajax({
-                url: '/usuario/desativar', // Endpoint para desativação de conta
+                url: '/usuario/desativar',
                 type: 'POST',
-                data: JSON.stringify({ id: /* Adicione o ID do usuário aqui, por exemplo: */ $('input[name="id"]').val() }),
+                data: JSON.stringify({ id: userId }),
                 contentType: 'application/json',
                 success: function(result) {
                     alert('Conta desativada com sucesso');
-                    window.location.href = '/logout'; // Redireciona para logout após desativação
+                    window.location.href = '/logout';
                 },
                 error: function(error) {
-                    alert('Erro ao desativar a conta');
+                    alert('Erro ao desativar a conta: ' + error.responseText);
                 }
             });
         }
