@@ -43,7 +43,6 @@
     </div>
 
     <div class="row">
-        <!-- Assuming artists is a list of artist objects passed from the controller -->
         <div class="col-md-4" th:each="artist : ${artists}">
             <a th:href="@{'/artistPage/' + ${artist.idusuario}}">
             <div class="artist-card">

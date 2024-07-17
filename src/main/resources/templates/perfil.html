@@ -49,15 +49,14 @@
     function deactivateAccount() {
         const confirmation = confirm("Você tem certeza que deseja desativar sua conta?");
         if (confirmation) {
-            const userId = $('input[name="idusuario"]').val();
+            //const userId = $('input[name="idusuario"]').val();
             $.ajax({
-                url: '/usuario/desativar',
+                url: '/artconnect/usuario/desativar',
                 type: 'POST',
-                data: JSON.stringify({ id: userId }),
                 contentType: 'application/json',
                 success: function(result) {
                     alert('Conta desativada com sucesso');
-                    window.location.href = '/logout';
+                    window.location.href = '/artconnect/logout';
                 },
                 error: function(error) {
                     alert('Erro ao desativar a conta: ' + error.responseText);

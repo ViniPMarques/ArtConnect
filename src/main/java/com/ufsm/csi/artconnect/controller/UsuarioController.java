@@ -96,15 +96,15 @@ public class UsuarioController {
 
     @PostMapping("/desativar")
     @ResponseBody
-    public ResponseEntity<String> desativarConta(@RequestBody Map<String, Long> payload) {
-        Long id = payload.get("id");
-        logger.info("Desativando conta com ID: " + id);
+    public ResponseEntity<String> desativarConta(Principal principal) {
+        UsuarioDto currentUser = usuarioService.findUsuarioByEmail(principal.getName());
+        logger.info("Desativando conta com ID: " + currentUser.getIdusuario());
         try {
-            usuarioService.deactivateAccount(id);
-            logger.info("Conta desativada com sucesso para o ID: " + id);
+            usuarioService.deactivateAccount(currentUser.getIdusuario());
+            logger.info("Conta desativada com sucesso para o ID: " + currentUser.getIdusuario());
             return ResponseEntity.ok("Conta desativada com sucesso");
         } catch (Exception e) {
-            logger.error("Erro ao desativar a conta com ID: " + id, e);
+            logger.error("Erro ao desativar a conta com ID: " + currentUser.getIdusuario(), e);
             return ResponseEntity.status(500).body("Erro ao desativar a conta");
         }
     }

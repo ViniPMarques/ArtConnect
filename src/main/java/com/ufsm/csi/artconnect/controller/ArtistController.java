@@ -175,18 +175,4 @@ public class ArtistController {
             throw new RuntimeException("Could not read file: " + filename, e);
         }
     }
-//
-//    @PostMapping("/deactivateAccount")
-//    @ResponseBody
-//    public String deactivateAccount(Authentication authentication) {
-//        String username = authentication.getName();
-//        Usuario usuario = usuarioService.findByNomeusuario(username);
-//        if (usuario != null) {
-//            usuario.setAtivo(false);
-//            usuarioService.updateUsuario(usuario);
-//            return "success";
-//        }
-//        return "error";
-//    }
-
 }
