@@ -21,4 +21,5 @@ public class Usuario {
     private String description;
     private String senhausuario;
     private int tipousuario;
+    private boolean ativo;
 }

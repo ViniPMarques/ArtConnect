@@ -6,6 +6,7 @@ CREATE TABLE Usuario(
                         description VARCHAR(200),
                         senhaUsuario VARCHAR(255) NOT NULL,
                         tipoUsuario INT,
+                        ativo BOOL DEFAULT 'true',
                         UNIQUE(emailUsuario)
 );
 
@@ -19,11 +20,22 @@ CREATE TABLE Obra(
 
 CREATE TABLE Comissao(
                          idcomissao SERIAL PRIMARY KEY,
+                         descricao VARCHAR(255),
+                         valor DECIMAL(10,2),
                          idartista INT,
-                         idcliente INT,
-                         dataComissao DATE,
-                         dataFinalizacao DATE,
-                         valorComissao DECIMAL(10,2),
-                         FOREIGN KEY (idartista) REFERENCES Usuario(idusuario),
-                         FOREIGN KEY (idcliente) REFERENCES Usuario(idusuario)
+                         FOREIGN KEY (idartista) REFERENCES Usuario(idusuario)
+);
+
+CREATE TABLE Pedido(
+                       idpedido SERIAL PRIMARY KEY,
+                       idartista INT,
+                       idcliente INT,
+                       idcomissao INT,
+                       dataComissao DATE,
+                       dataFinalizacao DATE,
+                       descricao VARCHAR(255),
+                       valorComissao DECIMAL(10,2),
+                       FOREIGN KEY (idartista) REFERENCES Usuario(idusuario),
+                       FOREIGN KEY (idcliente) REFERENCES Usuario(idusuario),
+                       FOREIGN KEY (idcomissao) REFERENCES Comissao(idcomissao)
 );

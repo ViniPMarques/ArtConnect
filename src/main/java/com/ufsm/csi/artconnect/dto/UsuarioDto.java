@@ -12,4 +12,5 @@ public class UsuarioDto {
     private String profilepicture;
     private String description;
     private int tipousuario;
+    private boolean ativo;
 }

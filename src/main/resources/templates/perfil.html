@@ -44,19 +44,22 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9hb/G6mGepKNWtLbllNs56p+mFXg4lY9g6XK2" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    function deactivateAccount(){
+    function deactivateAccount() {
         const confirmation = confirm("Você tem certeza que deseja desativar sua conta?");
-        if(confirmation){
+        if (confirmation) {
+            //const userId = $('input[name="idusuario"]').val();
             $.ajax({
-                url: '/artist/deactivateAccount',
+                url: '/artconnect/usuario/desativar',
                 type: 'POST',
+                contentType: 'application/json',
                 success: function(result) {
                     alert('Conta desativada com sucesso');
-                    window.location.href = '/logout';
+                    window.location.href = '/artconnect/logout';
                 },
                 error: function(error) {
-                    alert('Erro ao desativar a conta');
+                    alert('Erro ao desativar a conta: ' + error.responseText);
                 }
             });
         }
@@ -64,5 +67,3 @@
 </script>
 </body>
 </html>
-
-
